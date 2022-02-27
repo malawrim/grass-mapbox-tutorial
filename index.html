@@ -14,10 +14,12 @@
 <body>
 
 <div id='map'></div>
+<!-- Loads data from data_file.js -->
 <script src="./images/data_file.js"></script>
+
 <script>
 //Sets up the map
-mapboxgl.accessToken = 'pk.eyJ1IjoiY3R3aGl0ZSIsImEiOiItb0dqdUlZIn0.4Zb1DGESXnx0ePxMVLihZQ';
+mapboxgl.accessToken = 'pk.eyJ1IjoibWxhd3JpbW9yZSIsImEiOiJjbDA1bjlqN2YxbWQ0M2NvZHM4YWZ5N2hpIn0.sLAtb4M6l8i8QMIkJuajoA';
 var map = new mapboxgl.Map({
     container: 'map',
     zoom: 12,
@@ -33,10 +35,10 @@ map.addControl(new mapboxgl.NavigationControl());
 var frameCount = layerInfos.length;
 //Default used to start animation with first image
 var currentImage = 0;
-
-//Gets the current image
+ 
+//Gets the current image 
 function getPath() {
-    return "images/" + layerInfos[currentImage].file;
+   return "images/" + layerInfos[currentImage].file;
 }
 
 //Convert Bounds to match mapbox gl source specs
@@ -76,48 +78,7 @@ map.on('load', function() {
         currentImage = (currentImage + 1) % frameCount;
         map.getSource("grass").updateImage({ url: getPath() });
     }, 200);
-    
-    //Optional Add 3d Buildings so that they are visible above flooding
-if (! map.getSource('composite')) {map.addSource('composite', { type: 'vector', url: 'mapbox://mapbox.mapbox-streets-v7'});}
 
-var layers = map.getStyle().layers;
-
-var labelLayerId;
-for (var i = 0; i < layers.length; i++) {
-    if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-    labelLayerId = layers[i].id;
-    break;
-    }
-}
-
-
-//Add 3d Buildings layer
-map.addLayer({
-    'id': '3d-buildings',
-    'source': 'composite',
-    'source-layer': 'building',
-    'filter': ['==', 'extrude', 'true'],
-    'type': 'fill-extrusion',
-    'minzoom': 14,
-    'paint': {
-        'fill-extrusion-color': '#aaa',
-        // use an 'interpolate' expression to add a smooth transition effect to the
-        // buildings as the user zooms in
-        'fill-extrusion-height': [
-            "interpolate", ["linear"], ["zoom"],
-            14, 0,
-            14.05, ["get", "height"]
-        ],
-        'fill-extrusion-base': [
-            "interpolate", ["linear"], ["zoom"],
-            14, 0,
-            14.05, ["get", "min_height"]
-        ],
-        'fill-extrusion-opacity': 0.8
-        }
-    }, labelLayerId);
-
- 
 });
 
 </script>
